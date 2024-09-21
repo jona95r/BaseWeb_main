@@ -45,7 +45,15 @@ import { ListPermissionComponent } from './pages/permissions/list.permission.com
                                     './pages/permissions/permissions.module'
                                 ).then((m) => m.PermissionsModule),
                             canActivate: [AuthGuard],
-                        }
+                        },
+                        {
+                            path: 'reconciliaciones',
+                            loadChildren: () =>
+                                import(
+                                    './pages/reconciliations/reconciliations.module'
+                                ).then((m) => m.ReconciliationsModule),
+                            canActivate: [AuthGuard],
+                        },
                     ],
                 },
                 {

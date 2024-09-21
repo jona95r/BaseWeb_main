@@ -5,126 +5,38 @@
                 <skeleton-table-component [title]="title"></skeleton-table-component>
             </ng-template>
             <ng-template #showTable>
-                <form [formGroup]="formFilter" *ngIf="formFilter" class="mb-5">
-                    <div class="grid p-fluid">
-                        <div class="col-12 md:col-4">
-                            <span class="mt-4 p-float-label p-input-icon-left">
-                                <i class="pi pi-calendar"></i>
-                                <input id="from" type="date" pInputText  formControlName="from" [ngClass]="{ 'is-invalid': submitted && f.from.errors }">
-                                <label for="from">Desde</label>
-                            </span>
-                            <div *ngIf="formFilter.controls['from'].invalid && formFilter.controls['from'].dirty" >
-                                <small  *ngIf="formFilter.controls['from'].errors.required" id="from" class="p-error block">Desde es requerido</small>
-                            </div>
-                        </div>
-                        <div class="col-12 md:col-4">
-                            <span class="mt-4 p-float-label p-input-icon-left">
-                                <i class="pi pi-calendar"></i>
-                                <input id="to" type="date" pInputText  formControlName="to" [ngClass]="{ 'is-invalid': submitted && f.to.errors }">
-                                <label for="to">Hasta</label>
-                            </span>
-                            <div *ngIf="formFilter.controls['to'].invalid && formFilter.controls['to'].dirty" >
-                                <small  *ngIf="formFilter.controls['to'].errors.required" id="to" class="p-error block">Hasta es requerido</small>
-                            </div>
-                        </div>
-                        <div class="col-12 md:col-4">
-                            <button pButton  class="mt-4"  type="button" pButton pRipple icon ="pi pi-search"  label="Buscar"
-                             pTooltip="Buscar Fecha" tooltipPosition="bottom" (click)="getOrder()"></button>
-                        </div>
-                    </div>
-                </form>
-                    <p-table #dt [value]="orderList" [paginator]="true"  [rows]="5" [totalRecords]="orderList.length"
-                    responsiveLayout="scroll"  styleClass="p-datatable-sm p-datatable-gridlines" [globalFilterFields]="['id','docDate','cardCode', 'reference', 'docTotal']">
+                    <p-table #dt [value]="reconciliationList" [paginator]="true"  [rows]="5" [totalRecords]="reconciliationList.length"
+                    responsiveLayout="scroll"  styleClass="p-datatable-sm p-datatable-gridlines" [globalFilterFields]="['id','docDate','createdByName']">
                         <ng-template pTemplate="header">
                             <tr>
                                 <th pSortableColumn="id">Id <p-sortIcon field="id"></p-sortIcon> <p-columnFilter type="text" field="id" display="menu" class="ml-auto" ></p-columnFilter></th>
-                                <th pSortableColumn="company">Empresa<p-sortIcon field="company"></p-sortIcon> <p-columnFilter type="text" field="company" display="menu" class="ml-auto" ></p-columnFilter></th>
-                                <th pSortableColumn="cardCode">Codigo Proveedor <p-sortIcon field="cardCode"></p-sortIcon> <p-columnFilter type="text" field="cardCode" display="menu" class="ml-auto"></p-columnFilter></th>
-                                <th pSortableColumn="docDate">Fecha <p-sortIcon field="docDate"></p-sortIcon><p-columnFilter type="text" field="docDate" display="menu" class="ml-auto"></p-columnFilter></th>
-                                <th pSortableColumn="createdByName">Creado por <p-sortIcon field="createdByName"></p-sortIcon><p-columnFilter type="text" field="createdByName" display="menu" class="ml-auto"></p-columnFilter></th>
-                                <th pSortableColumn="status">Estatus <p-sortIcon field="status"></p-sortIcon><p-columnFilter type="text" field="status" display="menu" class="ml-auto"></p-columnFilter></th>
+                                <th pSortableColumn="docDate">Empresa<p-sortIcon field="docDate"></p-sortIcon> <p-columnFilter type="text" field="docDate" display="menu" class="ml-auto" ></p-columnFilter></th>
+                                <th pSortableColumn="createdByName">Codigo Proveedor <p-sortIcon field="createdByName"></p-sortIcon> <p-columnFilter type="text" field="createdByName" display="menu" class="ml-auto"></p-columnFilter></th>
                                 <th>Historial</th>
-                                <th>Editar Orden</th>
-                                <th>Descargar Documento</th>
                             </tr>
                         </ng-template>
                             <ng-template pTemplate="caption">
                                 <h4 class="mt-2">{{title}}</h4>
                                 <div class="flex">
                                     <!-- <button pButton  class="ml-2" pRipple type="button" (click)="addOrder()" pTooltip="Agregar nueva Orden" tooltipPosition="bottom" label="Agregar" ></button> -->
-                                    <p-button (onClick)="onDialogSubmit()" label="Agregar" pTooltip="Agregar nueva Orden"></p-button>
-                                    <p-dialog header="Crear Compra" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem', height: '18rem' }">
-                                        <div style="margin-bottom: 1rem;">
-                                            <p-dropdown 
-                                                [options]="[{label: 'Servicio', value: 'service'}, {label: 'Artículo', value: 'article'}]"
-                                                [(ngModel)]="selectedOption"
-                                                placeholder="Seleccione el tipo de compra"
-                                                [style]="{ width: '100%' }" 
-                                                [panelStyle]="{ maxHeight: '150px' }">
-                                            </p-dropdown>
-                                        </div>
-                                        <p-footer>
-                                            <p-button icon="pi pi-check" label="Aceptar" (onClick)="selectedOrder()" [disabled]="!selectedOption"></p-button>
-                                        </p-footer>
-                                    </p-dialog>
+                                    <p-button (onClick)="showNewReconciliation()" label="Nueva Reconciliacion" pTooltip="Generar una nueva reconciliacion"></p-button>
                                     <span class="p-input-icon-left ml-auto">
                                         <i class="pi pi-search"></i>
                                         <input pInputText type="text" (input)="dt.filterGlobal($event.target.value, 'contains')" placeholder="Buscar.." />
                                     </span>
                                 </div>
-                                <div class="flex">
-                                    <p-dialog header="Sin historial" [modal]="true" [(visible)]="showNoHistory" [breakpoints]="{'960px': '75vw'}" [style]="{ width: '20em', height: '18rem' }">
-                                        <div class="p-d-flex p-ai-center p-jc-start" style="height: 100%;">
-                                            <i class="pi pi-info-circle" style="font-size: 2rem; margin-right: 0.5rem; color: blue;"></i>
-                                            <p style="margin: 0;">La orden de compra no tiene un historial.</p>
-                                        </div>
-                                        <p-footer>
-                                            <p-button icon="pi pi-check" label="Ok" (onClick)="closeNoHistory()"></p-button>
-                                        </p-footer>
-                                    </p-dialog>
-                                </div>
                             </ng-template>
                         <ng-template pTemplate="body" let-order>
                             <tr>
                                 <td style="width: 10%; min-width: 2rem;">{{order.id }}</td>
-                                <td style="width: 10%; min-width: 2rem;">{{order.company }}</td>
-                                <td style="width: 35%; min-width: 7rem;">{{order.cardCode}}</td>
                                 <td style="width: 25%; min-width: 4rem;">{{order.docDate | date:'dd/MM/yyyy'}}</td>
                                 <td style="width: 25%; min-width: 4rem;">{{order.createdByName}}</td>
-                                <td style="width: 25%; min-width: 4rem;">
-                                    <span [ngClass]="{
-                                        'status-approved': order.status === 'A',
-                                        'status-pending': order.status === 'P',
-                                        'status-rejected': order.status === 'R',
-                                        'status-completed': order.status === 'C'
-                                      }">
-                                        {{ order.status === 'A' ? 'APROBADA' : 
-                                           (order.status === 'P' ? 'PENDIENTE' : 
-                                           (order.status === 'R' ? 'RECHAZADA' : 
-                                           (order.status === 'C' ? 'CREADA' : ''))) }}
-                                      </span>
-                                </td>
                                 <td style="width: 5%;">
                                     <button pTooltip="Historial de orden de compra." pButton pRipple icon="pi pi-eye" class="p-button-rounded" (click)="showChat(order)"></button>
-                                </td>
-                                <td style="width: 5%;">
-                                    <button pTooltip="Mostrar orden de compra." pButton pRipple icon="pi pi-arrow-circle-right" class="p-button-help" (click)="showOrder(order)"></button>
-                                </td>
-                                <td style="width: 5%;">
-                                    <ng-container *ngIf="order.status === 'C'; else lockIcon">
-                                        <button pTooltip="Visualizar orden de compra PDF." pButton pRipple icon="pi pi-file-pdf" class="p-button-warning" (click)="DownloadOrder(order)"></button>
-                                    </ng-container>
-                                    <ng-template #lockIcon>
-                                        <button pTooltip="Necesitas crear orden de compra en SAP." pButton pRipple icon="pi pi-lock" class="p-button-secondary" disabled></button>
-                                    </ng-template>
                                 </td>
                             </tr>
                         </ng-template>
                     </p-table>
-                    <app-load-order-dialog (OrderModify)="orderModify($event)"></app-load-order-dialog>
-                    <app-order-service-dialog (OrderModify)="orderModify($event)"></app-order-service-dialog>
-                    <app-order-article-dialog (OrderModify)="orderModify($event)"></app-order-article-dialog>
-                    <app-chat (OrderModify)="orderModify($event)"></app-chat>
             </ng-template>
         </div>
     </div>
