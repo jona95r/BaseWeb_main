@@ -8,25 +8,25 @@ import { AccountsModel } from '../models/accounts-model';
 @Injectable({
   providedIn: 'root'
 })
-export class ReconciliationsService {
+export class AccountsService {
 
   constructor(private http: HttpClient) {}
 
-  getReconciliationsById(id: number){
+  getAccountsById(id: number){
     return firstValueFrom(
       this.http.get<AccountsModel[]>(
         `${environment.uriLogistic}/api/Accounts/GetAccountsById/${id}`
       ));
   }
 
-  getReconciliationHistory(){
+  getAccountsHistory(){
     return firstValueFrom(
       this.http.get<AccountsModel[]>(
         `${environment.uriLogistic}/api/Accounts/GetAccountsHistory`
       ));
   }
 
-  getReconciliationsSap(userId: number){
+  getAccountsSap(userId: number){
     return firstValueFrom(
       this.http.get<AccountsDTOModel[]>(
         `${environment.uriLogistic}/api/Accounts/GetAccountsSap/${userId}`

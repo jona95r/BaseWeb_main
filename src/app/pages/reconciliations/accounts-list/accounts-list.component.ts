@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ReconciliationsService } from '../services/reconciliations.service';
 import { Messages } from 'src/app/helpers/messages';
 import { AuthService } from 'src/app/service/users/auth.service';
 import { User } from 'src/app/models/user';
@@ -10,6 +9,7 @@ import { style } from '@angular/animations';
 import { AccountsModel } from '../models/accounts-model';
 import { AccountsDTOModel } from '../models/accountsDTO-model';
 import { getLocaleDateFormat } from '@angular/common';
+import { AccountsService } from '../services/accounts.service';
 
 @Component({
   selector: 'app-accounts-list',
@@ -27,27 +27,27 @@ export class AccountsListComponent implements OnInit {
   title:string = "Listado de Cuentas";
   
   constructor(private fb: FormBuilder,
-    private reconciliationService: ReconciliationsService,
+    private accountsService: AccountsService,
     private authService: AuthService
   ) { this.user = authService.UserValue;}
 
   ngOnInit(): void {
-    this.getReconciliationsHistory();
+    this.getAccountsHistory();
     this.date = new Date().toISOString().substring(0, 10);
   }
 
   async showNewAccounts(){
     let result = await Messages.question("Nuevo Reporte","Generar un nuevo reporte creara un nuevo registro, ¿Esta seguro de generar un nuevo reporte? ")
     if(result){
-      this.accounts = await this.reconciliationService.getReconciliationsSap(this.user.userId);
+      this.accounts = await this.accountsService.getAccountsSap(this.user.userId);
       this.generatePdfReport();
     }
   }
 
   async getAccountById(account: any){
     console.log('Cuenta a buscar: ', account);
-    this.findAccounts = await this.reconciliationService.getReconciliationsById(account.id);
-    //Fecha
+    this.findAccounts = await this.accountsService.getAccountsById(account.id);
+    // Fecha
     this.date = this.findAccounts[0].docDate.toString().substring(0,10);
 
     this.accounts = [];
@@ -238,11 +238,11 @@ export class AccountsListComponent implements OnInit {
     this.accounts = [];
   }
 
-  async getReconciliationsHistory(){
+  async getAccountsHistory(){
     try{
       this.loading = true;
       Messages.loading("Cargando...","Espere un momento.");
-      this.accountsList = await this.reconciliationService.getReconciliationHistory();
+      this.accountsList = await this.accountsService.getAccountsHistory();
       Messages.closeLoading();
       this.loading = false;
     }catch(ex){
