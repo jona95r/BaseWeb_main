@@ -2,14 +2,14 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { ReconciliationsRoutingModule } from './reconciliations-routing.module';
-import { ReconciliationsListComponent } from './reconciliations-list/reconciliations-list.component';
+import { AccountsListComponent } from './accounts-list/accounts-list.component';
 import { ComponentsPrimeNg } from 'src/app/components-primeng';
 import { ReactiveFormsModule } from '@angular/forms';
 
 
 @NgModule({
   declarations: [
-    ReconciliationsListComponent
+    AccountsListComponent
   ],
   imports: [
     CommonModule,

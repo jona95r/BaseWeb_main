@@ -1,6 +1,6 @@
-export class ReconciliationDetailModel{
+export class AccountsDetailModel{
     idDetail: number;
-    idReconciliation: number;
+    IdAccount: number;
     empresa: string;
     segmento: number;
     nombreCuenta: string;

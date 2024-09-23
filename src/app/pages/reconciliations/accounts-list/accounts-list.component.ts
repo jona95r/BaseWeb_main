@@ -1,25 +1,28 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ReconciliationModel } from '../models/reconciliation-model';
 import { ReconciliationsService } from '../services/reconciliations.service';
 import { Messages } from 'src/app/helpers/messages';
-import { AccountsModel } from '../models/accounts-model';
 import { AuthService } from 'src/app/service/users/auth.service';
 import { User } from 'src/app/models/user';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import { style } from '@angular/animations';
+import { AccountsModel } from '../models/accounts-model';
+import { AccountsDTOModel } from '../models/accountsDTO-model';
+import { getLocaleDateFormat } from '@angular/common';
 
 @Component({
-  selector: 'app-reconciliations-list',
-  templateUrl: './reconciliations-list.component.html',
-  styleUrls: ['./reconciliations-list.component.scss']
+  selector: 'app-accounts-list',
+  templateUrl: './accounts-list.component.html',
+  styleUrls: ['./accounts-list.component.scss']
 })
-export class ReconciliationsListComponent implements OnInit {
+export class AccountsListComponent implements OnInit {
   loading: boolean = false;
   formFilter:FormGroup;
-  reconciliationList: ReconciliationModel[] = [];
-  accountList: AccountsModel[] = [];
+  accountsList: AccountsModel[] = [];
+  accounts: AccountsDTOModel[] = [];
+  findAccounts: AccountsModel[] = [];
+  date: string;
   user: User;
   title:string = "Listado de Cuentas";
   
@@ -30,15 +33,46 @@ export class ReconciliationsListComponent implements OnInit {
 
   ngOnInit(): void {
     this.getReconciliationsHistory();
+    this.date = new Date().toISOString().substring(0, 10);
   }
 
-  async showNewReconciliation(){
-    Messa
-    this.accountList = await this.reconciliationService.getReconciliationsSap(this.user.userId);
+  async showNewAccounts(){
+    let result = await Messages.question("Nuevo Reporte","Generar un nuevo reporte creara un nuevo registro, ¿Esta seguro de generar un nuevo reporte? ")
+    if(result){
+      this.accounts = await this.reconciliationService.getReconciliationsSap(this.user.userId);
+      this.generatePdfReport();
+    }
+  }
+
+  async getAccountById(account: any){
+    console.log('Cuenta a buscar: ', account);
+    this.findAccounts = await this.reconciliationService.getReconciliationsById(account.id);
+    //Fecha
+    this.date = this.findAccounts[0].docDate.toString().substring(0,10);
+
+    this.accounts = [];
+    // Itera sobre las cuentas encontradas
+    for(const accountItem of this.findAccounts){
+      // Itera sobre el detalle de cada cuenta
+      for(const detail of accountItem.detail){
+        // Crea un nuevo objeto del tipo AccountsDTOModel y asigna los valores correspondientes
+        const dto: AccountsDTOModel = {
+          empresa: detail.empresa,
+          segmento: detail.segmento,
+          nombreCuenta: detail.nombreCuenta,
+          monedaCuenta: detail.monedaCuenta,
+          totalLPS: detail.totalLPS,
+          totalUSD: detail.totalUSD,
+          banco: detail.banco
+        };
+        
+        // Agrega el nuevo objeto a la lista de cuentas DTO
+        this.accounts.push(dto);
+      }
+    }
+    console.log('Detalles extraídos: ', this.accounts);
     this.generatePdfReport();
   }
-
-  
 
   generatePdfReport() { 
     function formatCurrency(value) {
@@ -58,7 +92,9 @@ export class ReconciliationsListComponent implements OnInit {
     // Título principal
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(12);
-    doc.text('REPORTE DE CUENTAS BANCARIAS', 14, 10);
+    doc.text('REPORTE DE CUENTAS BANCARIAS', 14, 8);
+    doc.setTextColor(91, 91, 91);
+    doc.text(this.date, 263, 8);
 
     //Titulo secundario Chamer
     doc.setFont('helvetica', 'bold');
@@ -86,8 +122,8 @@ export class ReconciliationsListComponent implements OnInit {
     let sumaLPSInter: number = 0;
   debugger
     // Filtrar por empresas (CHAMER e INTERCOSMO en este caso)
-    const chamerAccounts = this.accountList.filter(acc => acc.empresa === 'CHAMER');
-    const intercosmoAccounts = this.accountList.filter(acc => acc.empresa === 'INTERCOSMO');
+    const chamerAccounts = this.accounts.filter(acc => acc.empresa === 'CHAMER');
+    const intercosmoAccounts = this.accounts.filter(acc => acc.empresa === 'INTERCOSMO');
     // Crear filas combinadas de ambas empresas
     chamerAccounts.forEach((account, index) => {
       const intercosmoAccount = intercosmoAccounts[index];
@@ -199,14 +235,14 @@ export class ReconciliationsListComponent implements OnInit {
 
     // Abrir el PDF en una nueva ventana
     doc.output('dataurlnewwindow');
-}
-
+    this.accounts = [];
+  }
 
   async getReconciliationsHistory(){
     try{
       this.loading = true;
       Messages.loading("Cargando...","Espere un momento.");
-      this.reconciliationList = await this.reconciliationService.getReconciliationHistory();
+      this.accountsList = await this.reconciliationService.getReconciliationHistory();
       Messages.closeLoading();
       this.loading = false;
     }catch(ex){

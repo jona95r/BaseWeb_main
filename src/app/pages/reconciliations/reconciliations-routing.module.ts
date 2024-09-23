@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { ReconciliationsListComponent } from './reconciliations-list/reconciliations-list.component';
+import { AccountsListComponent } from './accounts-list/accounts-list.component';
 
 const routes: Routes = [
     {
@@ -8,7 +8,7 @@ const routes: Routes = [
       children: [
           {
             path: 'reconciliaciones-lista',
-            component: ReconciliationsListComponent,
+            component: AccountsListComponent,
           },
       ],
   }

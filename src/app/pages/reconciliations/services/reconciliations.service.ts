@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { ReconciliationModel } from '../models/reconciliation-model';
 import { environment } from 'src/environments/environment';
 import { firstValueFrom } from 'rxjs';
+import { AccountsDTOModel } from '../models/accountsDTO-model';
 import { AccountsModel } from '../models/accounts-model';
 
 @Injectable({
@@ -14,22 +14,22 @@ export class ReconciliationsService {
 
   getReconciliationsById(id: number){
     return firstValueFrom(
-      this.http.get<ReconciliationModel[]>(
-        `${environment.uriLogistic}/api/Reconciliations/GetReconciliationsById/${id}`
+      this.http.get<AccountsModel[]>(
+        `${environment.uriLogistic}/api/Accounts/GetAccountsById/${id}`
       ));
   }
 
   getReconciliationHistory(){
     return firstValueFrom(
-      this.http.get<ReconciliationModel[]>(
-        `${environment.uriLogistic}/api/Reconciliations/GetReconciliationHistory`
+      this.http.get<AccountsModel[]>(
+        `${environment.uriLogistic}/api/Accounts/GetAccountsHistory`
       ));
   }
 
   getReconciliationsSap(userId: number){
     return firstValueFrom(
-      this.http.get<AccountsModel[]>(
-        `${environment.uriLogistic}/api/Reconciliations/GetReconciliationsSap/${userId}`
+      this.http.get<AccountsDTOModel[]>(
+        `${environment.uriLogistic}/api/Accounts/GetAccountsSap/${userId}`
       ));
   }
 

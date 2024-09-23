@@ -1,9 +1,10 @@
+import { AccountsDetailModel } from "./accountsDetail-model";
+
 export class AccountsModel{
-    empresa?: string;
-    segmento?: number;
-    nombreCuenta?: string;
-    monedaCuenta: string;
-    totalLPS?:number;
-    totalUSD?: number;
-    banco?: string;
+    id: number;
+    guid: string;
+    docDate: Date;
+    createdBy: number;
+    createdByName: string;
+    detail: AccountsDetailModel[]
 }
