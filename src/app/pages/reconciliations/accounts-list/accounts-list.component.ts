@@ -33,12 +33,12 @@ export class AccountsListComponent implements OnInit {
 
   ngOnInit(): void {
     this.getAccountsHistory();
-    this.date = new Date().toISOString().substring(0, 10);
   }
 
   async showNewAccounts(){
     let result = await Messages.question("Nuevo Reporte","Generar un nuevo reporte creara un nuevo registro, ¿Esta seguro de generar un nuevo reporte? ")
     if(result){
+      this.date = new Date().toISOString().substring(0, 10);
       this.accounts = await this.accountsService.getAccountsSap(this.user.userId);
       this.generatePdfReport();
     }
