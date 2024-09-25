@@ -40,7 +40,8 @@ export class AccountsListComponent implements OnInit {
     if(result){
       this.date = new Date().toISOString().substring(0, 10);
       this.accounts = await this.accountsService.getAccountsSap(this.user.userId);
-      this.generatePdfReport();
+      await this.generatePdfReport();
+      await this.getAccountsHistory();
     }
   }
 
@@ -238,47 +239,62 @@ export class AccountsListComponent implements OnInit {
   //   this.accounts = [];
   // }
 
-  generatePdfReport() { 
-    function formatCurrency(value) {
+  async generatePdfReport() {  
+    function formatCurrency(value: string) {
       const number = parseFloat(value);
-      if (isNaN(number)) return '0.0000'; 
+      if (isNaN(number)) return '0.00'; 
       return number.toLocaleString('en-US', {
-          minimumFractionDigits: 4,
-          maximumFractionDigits: 4
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
       });
     }
-    
+  
     const doc = new jsPDF('landscape');
-
+    const logoCompaniesUrl = 'assets/img/companies-logo.png';
+  
+    //Cargar y convertir el logo a base64
+    try {
+      const logoBlob = await this.fetchImage(logoCompaniesUrl);
+      const base64Logo = await this.convertBlobToBase64(logoBlob);
+      console.log(base64Logo);
+  
+      // Añadir el logo al PDF
+      doc.addImage(base64Logo, 'PNG', 7, -10, 57, 57);  // Ajusta el tamaño // (imagen, formato, x, y, ancho, alto)
+  
+    } catch (error) {
+      console.error('Error al cargar la imagen:', error);
+    }
+  
     // Título principal
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(12);
-    doc.text('REPORTE DE CUENTAS BANCARIAS', 14, 8);
+    doc.text('REPORTE DE CUENTAS BANCARIAS', 110, 20);
+  
     doc.setTextColor(91, 91, 91);
-    doc.text(this.date, 263, 8);
-
+    doc.text(this.date, 263, 26);
+  
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(12);
     doc.setTextColor(165, 15, 0);
-    doc.text('CHAMER', 100, 17);
-
+    doc.text('CHAMER', 100, 33);
+  
     doc.setFillColor(241, 241, 241); 
-    doc.rect(145, 10, 70, 15, 'F');
-    doc.text('INTERCOSMO', 165, 17);
-
+    doc.rect(143, 27, 69, 10, 'F');
+    doc.text('INTERCOSMO', 165, 33);
+  
     doc.setTextColor(0, 0, 0);
-    doc.text('COMBINADO', 235, 17);
-
+    doc.text('COMBINADO', 235, 33);
+  
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(163, 163, 163);
-    doc.text('_________________________________________________________________________________________', 75, 19);
-
+    doc.text('_________________________________________________________________________________________', 75, 36);
+  
     const tableBody: any[] = [];
     let sumaUSDChamer = 0;
     let sumaUSDInter = 0;
     let sumaLPSChamer = 0;
     let sumaLPSInter = 0;
-
+  
     // Agrupar cuentas por banco y moneda
     const groupByBancoYMoneda = (accounts: any[]) => {
       return accounts.reduce((acc, curr) => {
@@ -292,65 +308,61 @@ export class AccountsListComponent implements OnInit {
         return acc;
       }, {});
     };
-
-    // Agrupar cuentas de CHAMER e INTERCOSMO
+  
     const groupedChamerAccounts = groupByBancoYMoneda(this.accounts.filter(acc => acc.empresa === 'CHAMER'));
     const groupedIntercosmoAccounts = groupByBancoYMoneda(this.accounts.filter(acc => acc.empresa === 'INTERCOSMO'));
-
-    // Obtener todas las claves (banco-moneda) únicas
+  
     const allKeys = new Set([
       ...Object.keys(groupedChamerAccounts),
       ...Object.keys(groupedIntercosmoAccounts)
     ]);
-
+  
     allKeys.forEach(key => {
       const chamerAccount = groupedChamerAccounts[key] || { totalUSD: 0, totalLPS: 0 };
       const intercosmoAccount = groupedIntercosmoAccounts[key] || { totalUSD: 0, totalLPS: 0 };
-
-      // Calcular los totales combinados
+  
       const totalUSD = (chamerAccount.totalUSD || 0) + (intercosmoAccount.totalUSD || 0);
       const totalLPS = (chamerAccount.totalLPS || 0) + (intercosmoAccount.totalLPS || 0);
-
-      // Sumamos los totales por empresa
+  
       sumaUSDChamer += chamerAccount.totalUSD;
       sumaLPSChamer += chamerAccount.totalLPS;
       sumaUSDInter += intercosmoAccount.totalUSD;
       sumaLPSInter += intercosmoAccount.totalLPS;
-
-      // Añadir la fila a la tabla
+  
       const row = [
-        chamerAccount.banco || intercosmoAccount.banco, // Nombre del banco
-        chamerAccount.monedaCuenta === 'USD' ? formatCurrency(chamerAccount.totalUSD) : '', // USD CHAMER
-        chamerAccount.monedaCuenta === 'LPS' ? formatCurrency(chamerAccount.totalLPS) : '', // LPS CHAMER
-        intercosmoAccount.monedaCuenta === 'USD' ? formatCurrency(intercosmoAccount.totalUSD) : '', // USD INTERCOSMO
-        intercosmoAccount.monedaCuenta === 'LPS' ? formatCurrency(intercosmoAccount.totalLPS) : '', // LPS INTERCOSMO
-        formatCurrency(totalUSD), // Total combinado USD
-        formatCurrency(totalLPS)  // Total combinado LPS
+        {content: (intercosmoAccount.banco + ' ' + intercosmoAccount.monedaCuenta) || (intercosmoAccount.banco + ' ' + intercosmoAccount.monedaCuenta),
+          styles: {
+            halign: 'right',
+          }
+        },
+        {content: chamerAccount.monedaCuenta === 'USD' ? formatCurrency(chamerAccount.totalUSD) : '', styles:{halign: 'right'}} ,
+        {content: chamerAccount.monedaCuenta === 'LPS' ? formatCurrency(chamerAccount.totalLPS) : '', styles:{halign: 'right'}},
+        {content: intercosmoAccount.monedaCuenta === 'USD' ? formatCurrency(intercosmoAccount.totalUSD) : '', styles:{halign: 'right'}},
+        {content: intercosmoAccount.monedaCuenta === 'LPS' ? formatCurrency(intercosmoAccount.totalLPS) : '', styles:{halign: 'right'}},
+        {content: formatCurrency(totalUSD), styles:{halign: 'right', fontStyle: 'bold'}},
+        {content: formatCurrency(totalLPS), styles:{halign: 'right', fontStyle: 'bold'}}
       ];
-
+  
       tableBody.push(row);
     });
-
-    // Agregar fila de totales
+  
     const totalRow = [
-      {content: 'Totales', styles:{fontStyle: 'bold'}},
-      {content: formatCurrency(sumaUSDChamer), styles: {fontStyle: 'bold'}},
-      {content: formatCurrency(sumaLPSChamer), styles: {fontStyle: 'bold'}},
-      {content: formatCurrency(sumaUSDInter), styles: {fontStyle: 'bold'}},
-      {content: formatCurrency(sumaLPSInter), styles: {fontStyle: 'bold'}},
-      {content: formatCurrency(sumaUSDChamer + sumaUSDInter), styles: {fontStyle: 'bold'}},
-      {content: formatCurrency(sumaLPSChamer + sumaLPSInter), styles: {fontStyle: 'bold'}}
+      { content: 'Totales', styles: { fontStyle: 'bold' } },
+      { content: formatCurrency(sumaUSDChamer.toString()), styles: { fontStyle: 'bold' } },
+      { content: formatCurrency(sumaLPSChamer.toString()), styles: { fontStyle: 'bold' } },
+      { content: formatCurrency(sumaUSDInter.toString()), styles: { fontStyle: 'bold' } },
+      { content: formatCurrency(sumaLPSInter.toString()), styles: { fontStyle: 'bold' } },
+      { content: formatCurrency((sumaUSDChamer + sumaUSDInter).toString()), styles: { fontStyle: 'bold' } },
+      { content: formatCurrency((sumaLPSChamer + sumaLPSInter).toString()), styles: { fontStyle: 'bold' } }
     ];
     tableBody.push(totalRow);
-
-    // Definir columnas y estilos de la tabla
-    const tableColumns = ['Banco', 'USD CHAMER', 'LPS CHAMER', 'USD INTERCOSMO', 'LPS INTERCOSMO', 'TOTAL USD', 'TOTAL LPS'];
-
-    // Agregar la tabla al PDF
+  
+    const tableColumns = ['Banco', {content:'USD',styles: { halign: 'center' }}, 'LPS', 'USD', 'LPS', 'TOTAL USD', 'TOTAL LPS'];
+  
     (doc as any).autoTable({
       head: [tableColumns],
       body: tableBody,
-      startY: 20,
+      startY: 40,
       styles: {
         halign: 'center',
       },
@@ -363,9 +375,28 @@ export class AccountsListComponent implements OnInit {
         fillColor: [240, 240, 240],
       },
     });
-
+  
     doc.output('dataurlnewwindow');
     this.accounts = [];
+  }
+  
+  // Método para cargar imagen
+  async fetchImage(url: string): Promise<Blob> {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`No se pudo cargar la imagen: ${url}`);
+    }
+    return response.blob();
+  }
+  
+  // Convertir Blob a Base64
+  async convertBlobToBase64(blob: Blob): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
   }
 
   async getAccountsHistory(){
