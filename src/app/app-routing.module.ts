@@ -47,6 +47,14 @@ import { ListPermissionComponent } from './pages/permissions/list.permission.com
                             canActivate: [AuthGuard],
                         },
                         {
+                            path: 'logs',
+                            loadChildren: () =>
+                                import('./pages/logs/logs.module').then(
+                                    (m) => m.LogsModule
+                                ),
+                            canActivate: [AuthGuard],
+                        },
+                        {
                             path: 'reconciliaciones',
                             loadChildren: () =>
                                 import(

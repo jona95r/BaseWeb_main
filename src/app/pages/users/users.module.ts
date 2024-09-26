@@ -5,7 +5,8 @@ import { UsersRoutingModule } from './users-routing.module';
 
 
 @NgModule({
-  declarations: [],
+  declarations: [
+  ],
   imports: [
     CommonModule,
     UsersRoutingModule

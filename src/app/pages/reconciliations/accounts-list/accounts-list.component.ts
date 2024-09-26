@@ -332,7 +332,7 @@ export class AccountsListComponent implements OnInit {
       const row = [
         {content: (intercosmoAccount.banco + ' ' + intercosmoAccount.monedaCuenta) || (intercosmoAccount.banco + ' ' + intercosmoAccount.monedaCuenta),
           styles: {
-            halign: 'right',
+            halign: 'left',
           }
         },
         {content: chamerAccount.monedaCuenta === 'USD' ? formatCurrency(chamerAccount.totalUSD) : '', styles:{halign: 'right'}} ,
@@ -348,16 +348,16 @@ export class AccountsListComponent implements OnInit {
   
     const totalRow = [
       { content: 'Totales', styles: { fontStyle: 'bold' } },
-      { content: formatCurrency(sumaUSDChamer.toString()), styles: { fontStyle: 'bold' } },
-      { content: formatCurrency(sumaLPSChamer.toString()), styles: { fontStyle: 'bold' } },
-      { content: formatCurrency(sumaUSDInter.toString()), styles: { fontStyle: 'bold' } },
-      { content: formatCurrency(sumaLPSInter.toString()), styles: { fontStyle: 'bold' } },
-      { content: formatCurrency((sumaUSDChamer + sumaUSDInter).toString()), styles: { fontStyle: 'bold' } },
-      { content: formatCurrency((sumaLPSChamer + sumaLPSInter).toString()), styles: { fontStyle: 'bold' } }
+      { content: formatCurrency(sumaUSDChamer.toString()), styles: { halign: 'right', fontStyle: 'bold' } },
+      { content: formatCurrency(sumaLPSChamer.toString()), styles: { halign: 'right', fontStyle: 'bold' } },
+      { content: formatCurrency(sumaUSDInter.toString()), styles: { halign: 'right', fontStyle: 'bold' } },
+      { content: formatCurrency(sumaLPSInter.toString()), styles: { halign: 'right', fontStyle: 'bold' } },
+      { content: formatCurrency((sumaUSDChamer + sumaUSDInter).toString()), styles: { halign: 'right', fontStyle: 'bold' } },
+      { content: formatCurrency((sumaLPSChamer + sumaLPSInter).toString()), styles: { halign: 'right', fontStyle: 'bold' } }
     ];
     tableBody.push(totalRow);
   
-    const tableColumns = ['Banco', {content:'USD',styles: { halign: 'center' }}, 'LPS', 'USD', 'LPS', 'TOTAL USD', 'TOTAL LPS'];
+    const tableColumns = ['Banco', {content:'USD',styles: { halign: 'right' }}, {content:'LPS', style:{ haligh: 'right'}}, {content:'USD', style:{halign:'right'}}, {content:'LPS', style: {halign: 'right'}}, {content:'TOTAL USD', style: {halign:'right'}}, {content:'TOTAL LPS', style: {halign: 'right'}}];
   
     (doc as any).autoTable({
       head: [tableColumns],

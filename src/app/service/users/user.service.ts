@@ -5,6 +5,7 @@ import { Role } from '../../models/role';
 import { Theme } from '../../models/theme';
 import { User } from '../../models/user';
 import { firstValueFrom } from 'rxjs';
+import { LoginHistoryModel } from 'src/app/pages/logs/models/login-history';
 
 @Injectable()
 export class UserService {
@@ -26,5 +27,8 @@ export class UserService {
     }
     async getThemes() {
       return await firstValueFrom(this.http.get<Theme[]>(`${environment.uriLogistic}/user/Themes`));
+    }
+    async getLoginHistory(){
+      return await firstValueFrom(this.http.get<LoginHistoryModel[]>(`${environment.uriLogistic}/Auth/GetLoginHistory`));
     }
 }
