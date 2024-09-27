@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 
 import { LogsRoutingModule } from './logs-routing.module';
 import { LoginHistoryComponent } from './login-history/login-history.component';
+import { ComponentsPrimeNg } from 'src/app/components-primeng';
 
 
 @NgModule({
@@ -11,7 +12,8 @@ import { LoginHistoryComponent } from './login-history/login-history.component';
   ],
   imports: [
     CommonModule,
-    LogsRoutingModule
+    LogsRoutingModule,
+    ComponentsPrimeNg
   ]
 })
 export class LogsModule { }

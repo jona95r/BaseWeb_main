@@ -11,7 +11,7 @@ import { Messages } from 'src/app/helpers/messages';
 })
 export class LoginHistoryComponent implements OnInit {
   loading: boolean = false;
-  title:string = "Registro de Inicio de Sesión";
+  title:string = "Listado de Inicio de Sesión";
   historyList: LoginHistoryModel[] = [];
 
   constructor(private authService: AuthService,

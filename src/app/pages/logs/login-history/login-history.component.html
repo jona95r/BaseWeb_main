@@ -17,8 +17,6 @@
                             <ng-template pTemplate="caption">
                                 <h4 class="mt-2">{{title}}</h4>
                                 <div class="flex">
-                                    <!-- <button pButton  class="ml-2" pRipple type="button" (click)="addOrder()" pTooltip="Agregar nueva Orden" tooltipPosition="bottom" label="Agregar" ></button> -->
-                                    <p-button (onClick)="showNewAccounts()" label="Nuevo Reporte" pTooltip="Generar un nuevo reporte de cuentas bancarias"></p-button>
                                     <span class="p-input-icon-left ml-auto">
                                         <i class="pi pi-search"></i>
                                         <input pInputText type="text" (input)="dt.filterGlobal($event.target.value, 'contains')" placeholder="Buscar.." />
@@ -27,12 +25,9 @@
                             </ng-template>
                         <ng-template pTemplate="body" let-user>
                             <tr>
-                                <td style="width: 10%; min-width: 2rem;">{{user.userID }}</td>
+                                <td style="width: 15%; min-width: 3rem;">{{user.userID }}</td>
                                 <td style="width: 25%; min-width: 4rem;">{{user.name }}</td>
-                                <td style="width: 25%; min-width: 4rem;">{{user.date | date:'dd/MM/yyyy'}}</td>
-                                <td style="width: 5%;">
-                                    <button pTooltip="Historial de orden de compra." pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-help" (click)="getAccountById(account)"></button>
-                                </td>
+                                <td style="width: 25%; min-width: 4rem;">{{user.date | date:'dd/MM/yyyy HH:mm:ss'}}</td>
                             </tr>
                         </ng-template>
                     </p-table>
