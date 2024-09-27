@@ -46,7 +46,6 @@ export class AccountsListComponent implements OnInit {
   }
 
   async getAccountById(account: any){
-    console.log('Cuenta a buscar: ', account);
     this.findAccounts = await this.accountsService.getAccountsById(account.id);
     // Fecha
     this.date = this.findAccounts[0].docDate.toString().substring(0,10);
@@ -71,7 +70,6 @@ export class AccountsListComponent implements OnInit {
         this.accounts.push(dto);
       }
     }
-    console.log('Detalles extraídos: ', this.accounts);
     this.generatePdfReport();
   }
 
@@ -139,20 +137,11 @@ export class AccountsListComponent implements OnInit {
   //     const totalUSD = chamerTotalUSD + intercosmoTotalUSD;
   //     const totalLPS = chamerTotalLPS + intercosmoTotalLPS;
 
-  //     console.log('chamerTotalUSD',chamerTotalUSD);
-  //     console.log('chamerTotalLPS',chamerTotalLPS);
-  //     console.log('intercosmoTotalUSD',intercosmoTotalUSD);
-  //     console.log('intercosmoTotalLPS',intercosmoTotalLPS);
   //     // Sumamos el total por columna
   //     sumaUSDChamer += chamerTotalUSD;
   //     sumaLPSChamer +=  chamerTotalLPS;
   //     sumaUSDInter += intercosmoTotalUSD;
   //     sumaLPSInter += intercosmoTotalLPS;
-
-  //     console.log('sumaUSDChamer',sumaUSDChamer);
-  //     console.log('sumaLPSChamer',sumaLPSChamer);
-  //     console.log('sumaUSDInter',sumaUSDInter);
-  //     console.log('sumaLPSInter',sumaLPSInter);
    
   //     const row = [
   //       account.nombreCuenta, // Nombre del banco para CHAMER
@@ -256,7 +245,6 @@ export class AccountsListComponent implements OnInit {
     try {
       const logoBlob = await this.fetchImage(logoCompaniesUrl);
       const base64Logo = await this.convertBlobToBase64(logoBlob);
-      console.log(base64Logo);
   
       // Añadir el logo al PDF
       doc.addImage(base64Logo, 'PNG', 7, -10, 57, 57);  // Ajusta el tamaño // (imagen, formato, x, y, ancho, alto)
