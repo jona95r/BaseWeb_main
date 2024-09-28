@@ -18,7 +18,7 @@
 							<ng-template pTemplate="caption">
                                 <h4 class="mt-2">{{title}}</h4>
 								<div class="flex">
-									<button pButton class="ml-2" pRipple type="button" (click)="addRole()" pTooltip="Generar un reporte con fecha actual en PDF" tooltipPosition="bottom" label="Nuevo"></button>
+									<button pButton class="ml-2" pRipple type="button" (click)="showNewAccounts()" pTooltip="Generar un reporte con fecha actual en PDF" tooltipPosition="bottom" label="Nuevo"></button>
 									<span class="p-input-icon-left ml-auto">
 										<i class="pi pi-search"></i>
 										<input pInputText type="text" (input)="dt.filterGlobal($event.target.value, 'contains')" placeholder="Buscar..." />
